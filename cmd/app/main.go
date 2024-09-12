@@ -1,17 +1,18 @@
 package main
 
 import (
-    "fmt"
-    "log"
-    "to-do-app/config"
-    tokenModel "to-do-app/iternal/auth/domain/model"
-    itemModel "to-do-app/iternal/item/domain/model"
-    userModel "to-do-app/iternal/user/domain/model"
-    fiberRouter "to-do-app/pkg/fiber"
+	"fmt"
+	"log"
+	"to-do-app/config"
+	tokenModel "to-do-app/iternal/auth/domain/model"
+	itemModel "to-do-app/iternal/item/domain/model"
+	userModel "to-do-app/iternal/user/domain/model"
+	fiberRouter "to-do-app/pkg/fiber"
 
-    "github.com/gofiber/fiber/v2"
-    "gorm.io/driver/postgres"
-    "gorm.io/gorm"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 func main() {
@@ -22,8 +23,9 @@ func main() {
         panic("Fatal to connect db")
     }
     if err := db.AutoMigrate(&userModel.User{}, &itemModel.Item{}, &tokenModel.Token{}); err != nil {
-
+        fmt.Println("connection error",err.Error())
     }
+    app.Use(cors.New())
     api := app.Group("api/v1")
     fiberRouter.SetupRoutes(api, db)
     log.Fatal(app.Listen(":3000"))
